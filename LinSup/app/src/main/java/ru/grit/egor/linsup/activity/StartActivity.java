@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
 import org.apache.commons.math3.optimization.GoalType;
 import org.apache.commons.math3.optimization.PointValuePair;
@@ -62,8 +63,12 @@ public class StartActivity extends AppCompatActivity {
             Log.i(TAG, "Iteration " + iter);
             init();
             try {
-                simplex();
-                printSimplex();
+                try {
+                    int i = simplex();
+                    printSimplex(i);
+                } catch (MaxCountExceededException e ) {
+                    Log.i(TAG, "Max Count Exceeded Exception");
+                }
 
                 startLinSup();
                 printLinSup();
@@ -116,8 +121,8 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void init() {
-        I = 5;
-        J = 4;
+        I = 250;
+        J = 200;
         for (int j = 0; j < J; j++) {
             y0.add(10.0);
         }
@@ -270,7 +275,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
 
-    private void simplex() {
+    private int simplex() {
 
         // describe the optimization problem
         LinearObjectiveFunction f = new LinearObjectiveFunction(LinSupUtils.toArray(C), 0);
@@ -281,14 +286,16 @@ public class StartActivity extends AppCompatActivity {
 
         // create and run the solver
         SimplexSolver solver = new SimplexSolver();
+        solver.setMaxIterations(10000);
         solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
-
+        return solver.getIterations();
     }
 
 
-    private void printSimplex() {
+    private void printSimplex(int iters) {
         if (solution != null) {
             Log.i(TAG, "----------- Simplex function MINIMIZE ---------");
+            Log.i(TAG, "STEPS: " + iters);
             Log.i(TAG, "f(x) = " + solution.getValue());
             for (int j = 0; j < J; j++) {
                 Log.i(TAG, "x("+j+") = " + solution.getPoint()[j]);
@@ -298,15 +305,14 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void printLinSup() {
-        if (solution != null) {
-            Log.i(TAG, "----------- LinSup function MINIMIZE ---------");
-            Log.i(TAG, "STEPS: " + (yk.size()-1));
-            Log.i(TAG, "f(x) = " + LinSupUtils.innerProduction(C, yk.get(yk.size()-1)));
-            for (int j = 0; j < J; j++) {
-                Log.i(TAG, "x("+j+") = " + yk.get(yk.size()-1).get(j));
-            }
-            Log.i(TAG, "----------- -------------------------- ---------");
+        Log.i(TAG, "----------- LinSup function MINIMIZE ---------");
+        Log.i(TAG, "STEPS: " + (yk.size() - 1));
+        Log.i(TAG, "f(x) = " + LinSupUtils.innerProduction(C, yk.get(yk.size() - 1)));
+        for (int j = 0; j < J; j++) {
+            Log.i(TAG, "x(" + j + ") = " + yk.get(yk.size() - 1).get(j));
         }
+        Log.i(TAG, "----------- -------------------------- ---------");
+
     }
 
 }
