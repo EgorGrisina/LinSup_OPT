@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
 import org.apache.commons.math3.optimization.GoalType;
 import org.apache.commons.math3.optimization.PointValuePair;
 import org.apache.commons.math3.optimization.linear.LinearConstraint;
@@ -35,8 +36,10 @@ public class StartActivity extends AppCompatActivity {
     int I = 4;
     int J = 4;
     Double a = 0.99;
-    Double lambda = 1.0;
-    Double e = 0.0000000001;
+    Double lambda = 2.99;
+    Double e = 1.0E-10;
+    Double e2 = 1.0E-5;
+
 
     PointValuePair solution = null;
 
@@ -46,29 +49,43 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        init_test1();
+        //init_test2();
+        for (int iter = 0; iter < N; iter++) {
+            yk = new ArrayList<>();
+            lk = new HashMap<>();
+            A = new ArrayList<>();
+            B = new ArrayList<>();
+            C = new ArrayList<>();
+            y0 = new ArrayList<>();
 
-        simplex();
-        printSimplex();
+            Log.i(TAG, "-------------------------------------------------------------------");
+            Log.i(TAG, "Iteration " + iter);
+            init();
+            try {
+                simplex();
+                printSimplex();
 
-        startLinSup();
-        printLinSup();
+                startLinSup();
+                printLinSup();
+            } catch (UnboundedSolutionException e ) {
+                Log.i(TAG, "Unbounded Solution Exception");
+            }
+        }
+        Log.i(TAG, "-------------------------------------------------------------------");
     }
 
     private void init_test1() {
-        I = 5;
-        J = 4;
-        C.addAll(LinSupUtils.toList(new double[] { 1, 1, 1, 1  } ));
-        B.addAll(LinSupUtils.toList(new double[] { 2.0, 2.0, 2.0, 2.0, 2.0} ));
+        I = 3;
+        J = 2;
+        C.addAll(LinSupUtils.toList(new double[] { 1, 1} ));
+        B.addAll(LinSupUtils.toList(new double[] { 16.0, 10.0, 8.0} ));
 
         for (int i = 0; i < I; i++) {
             A.add(new ArrayList<Double>());
         }
-        A.get(0).addAll(LinSupUtils.toList(new double[] {1, 0, 0, 0 } ));
-        A.get(1).addAll(LinSupUtils.toList(new double[] {0, 1, 0, 0 } ));
-        A.get(2).addAll(LinSupUtils.toList(new double[] {0, 0, 1, 0 } ));
-        A.get(3).addAll(LinSupUtils.toList(new double[] {0, 0, 0, 1 } ));
-        A.get(4).addAll(LinSupUtils.toList(new double[] {1, 0, 0, 0 } ));
+        A.get(0).addAll(LinSupUtils.toList(new double[] {1, 0} ));
+        A.get(1).addAll(LinSupUtils.toList(new double[] {0, 1 } ));
+        A.get(2).addAll(LinSupUtils.toList(new double[] {0.5, 0.4 } ));
 
 
         // LinSup init-s
@@ -77,21 +94,46 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private void init() {
-        for (int j = 0; j < J; j++) {
-            y0.add(2.0);
-        }
-        for (int j = 0; j < J; j++) {
-            C.add(10.0);
-        }
+    private void init_test2() {
+        I = 5;
+        J = 5;
+        C.addAll(LinSupUtils.toList(new double[] { -0.6, 1.9, -1.2, 2.6, 0.1} ));
+        B.addAll(LinSupUtils.toList(new double[] { 10.5, 10.2, 10.5, 12.0, 11.6} ));
+
         for (int i = 0; i < I; i++) {
-            B.add(-1.0);
+            A.add(new ArrayList<Double>());
+        }
+        A.get(0).addAll(LinSupUtils.toList(new double[] {0.5, -1.2, 0.8, 1.9, 1.1} ));
+        A.get(1).addAll(LinSupUtils.toList(new double[] {0.9, 0.2, -1.8, -0.7, 0.3} ));
+        A.get(2).addAll(LinSupUtils.toList(new double[] {2.0, -1.4, 0.5, 1.1, 1.9} ));
+        A.get(3).addAll(LinSupUtils.toList(new double[] {1.5, -0.3, -0.6, 2.0, 0.4} ));
+        A.get(4).addAll(LinSupUtils.toList(new double[] {-0.7, 1.9, 1.1, 1.0, 1.6} ));
+
+        // LinSup init-s
+        for (int j = 0; j < J; j++) {
+            y0.add(10.0);
+        }
+    }
+
+    private void init() {
+        I = 5;
+        J = 4;
+        for (int j = 0; j < J; j++) {
+            y0.add(10.0);
+        }
+        for (int j = 0; j < J; j++) {
+            C.add(LinSupUtils.getRandom(-2.0, 3.0));
         }
         for (int i = 0; i < I; i++) {
             A.add(new ArrayList<Double>());
             for (int j = 0; j < J; j++) {
-                A.get(i).add(1.0);
+                A.get(i).add(LinSupUtils.getRandom(-1.0,2.0));
             }
+        }
+
+
+        for (int i = 0; i < I; i++) {
+            B.add(LinSupUtils.getRandom(5.0,15.0));
         }
     }
 
@@ -106,7 +148,8 @@ public class StartActivity extends AppCompatActivity {
         lk.put(-1, 0);                      // lk(-1) <- 0
         HashMap<Integer, HashMap<Integer, ArrayList<Double>>> ykn = new HashMap<>();
 
-        while (getProximityFun(yk.get(k)) > e) {
+        while (getProximityFun(yk.get(k)) > e ||
+                (k==0 || getStoppingRule(yk.get(k-1),yk.get(k)) > e2)) {
 
             int n = 0;                      // n <- 0
             int l = LinSupUtils.getRandom(k, lk.get(k-1)); // l <- rand(k,lk(k-1)
@@ -116,17 +159,19 @@ public class StartActivity extends AppCompatActivity {
             ykn.get(k).get(n).addAll(yk.get(k));
 
             while (n < N) {
-                Double betta = Math.pow(a, l);   // Bkn <- nl
 
+                Double betta = Math.pow(a, l);   // Bkn <- nl
                 ArrayList<Double> z = LinSupUtils.getZ(ykn.get(k).get(n), betta, C); // z <- ykn - betta* c / ||c||2
-                //z.addAll(ykn.get(k).get(n));
-                n = n+1;                        // n <- n+1
+
+                n = n + 1;                        // n <- n+1
+
                 ykn.get(k).put(n, new ArrayList<Double>());
                 ykn.get(k).get(n).addAll(z);    // ykn <- z
 
-                l = l+1;                        // l <- l+1
+                l = l + 1;                        // l <- l+1
 
             }
+
 
             lk.put(k, l);                       // lk <- l
 
@@ -137,6 +182,13 @@ public class StartActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    private double getStoppingRule(ArrayList<Double> prev, ArrayList<Double> next) {
+        ArrayList<Double> temp = LinSupUtils.vectorsDifference(next, prev);
+        double result = LinSupUtils.secondVectorNorm(temp) / LinSupUtils.secondVectorNorm(next);
+        Log.d(TAG, "getStoppingRule " + result);
+        return result;
     }
 
     private double getProximityFun(ArrayList<Double> x) {
@@ -173,7 +225,7 @@ public class StartActivity extends AppCompatActivity {
 
         if (LinSupUtils.innerProduction(A.get(i),z) > B.get(i)) {
             Double temp = (LinSupUtils.innerProduction(A.get(i),z) - B.get(i));
-            temp = (temp) / LinSupUtils.innerProduction(A.get(i), A.get(i));
+            temp = (temp) / LinSupUtils.secondVectorNorm(A.get(i));
             result = LinSupUtils.vectorsDifference(result, LinSupUtils.production(A.get(i), temp));
         }
         return result;
@@ -191,6 +243,12 @@ public class StartActivity extends AppCompatActivity {
         }
         result = LinSupUtils.production(result, (lambda/I));
         result = LinSupUtils.vectorsSum(prev, result);
+
+        for (int a = 0; a < result.size(); a++) {
+            if (result.get(a) < 0.0) {
+                result.set(a,0.0);
+            }
+        }
 
         return result;
 
@@ -230,23 +288,24 @@ public class StartActivity extends AppCompatActivity {
 
     private void printSimplex() {
         if (solution != null) {
-            Log.d(TAG, "----------- Simplex function MINIMIZE ---------");
-            Log.d(TAG, "f(x) = " + solution.getValue());
+            Log.i(TAG, "----------- Simplex function MINIMIZE ---------");
+            Log.i(TAG, "f(x) = " + solution.getValue());
             for (int j = 0; j < J; j++) {
-                Log.d(TAG, "x("+j+") = " + solution.getPoint()[j]);
+                Log.i(TAG, "x("+j+") = " + solution.getPoint()[j]);
             }
-            Log.d(TAG, "----------- -------------------------- ---------");
+            Log.i(TAG, "----------- -------------------------- ---------");
         }
     }
 
     private void printLinSup() {
         if (solution != null) {
-            Log.d(TAG, "----------- Simplex function LinSup ---------");
-            Log.d(TAG, "f(x) = " + LinSupUtils.innerProduction(C, yk.get(yk.size()-1)));
+            Log.i(TAG, "----------- LinSup function MINIMIZE ---------");
+            Log.i(TAG, "STEPS: " + (yk.size()-1));
+            Log.i(TAG, "f(x) = " + LinSupUtils.innerProduction(C, yk.get(yk.size()-1)));
             for (int j = 0; j < J; j++) {
-                Log.d(TAG, "x("+j+") = " + yk.get(yk.size()-1).get(j));
+                Log.i(TAG, "x("+j+") = " + yk.get(yk.size()-1).get(j));
             }
-            Log.d(TAG, "----------- -------------------------- ---------");
+            Log.i(TAG, "----------- -------------------------- ---------");
         }
     }
 

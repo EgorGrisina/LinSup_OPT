@@ -97,6 +97,19 @@ public class LinSupUtils {
         return result;
     }
 
+    public static double getRandom(double low, double high) {
+        if (high < low) {
+            Log.e(TAG, "getRandom : bad values!");
+        }
+        if (high == 0.0 && low == 0.0) {
+            Log.i(TAG, "getRandom : zero values!");
+            return 0;
+        }
+        Random r = new Random();
+        double result = low + (high - low) * r.nextDouble();
+        return result;
+    }
+
     public static ArrayList<Double> getZ (ArrayList<Double> y, Double betta, ArrayList<Double> c) {
         if (y.size() != c.size() || y.size() == 0) {
             Log.e(TAG, "getZ : bad vectors size!");
