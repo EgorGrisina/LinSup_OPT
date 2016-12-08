@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class LinProgSolver {
+public class LinSupSolver {
 
-    final static String TAG = LinProgSolver.class.getSimpleName();
+    final static String TAG = LinSupSolver.class.getSimpleName();
 
     ArrayList<ArrayList<Double>> yk = new ArrayList<>();
 
@@ -85,18 +85,79 @@ public class LinProgSolver {
         Log.i(TAG, "-------------------------------------------------------------------");
     }*/
 
+    void clear() {
+        yk = new ArrayList<>();
+        lk = new HashMap<>();
+        A = new ArrayList<>();
+        B = new ArrayList<>();
+        C = new ArrayList<>();
+        y0 = new ArrayList<>();
+        solution = null;
+    }
+
+
+    public ArrayList<Double> solveForCompare1() {
+        ArrayList<Double> result = new ArrayList<>();
+        clear();
+        I = 80;
+        J = 100;
+        initRandom();
+        try {
+            int i = simplex();
+            printSimplex(i);
+            result.add(solution.getValue());
+        } catch (Exception e) {
+            Log.i(TAG, e.toString());
+        }
+        clear();
+        I = 200;
+        J = 150;
+        initRandom();
+        try {
+            int i = simplex();
+            printSimplex(i);
+            result.add(solution.getValue());
+        } catch (Exception e) {
+            Log.i(TAG, e.toString());
+        }
+        clear();
+        I = 400;
+        J = 500;
+        initRandom();
+        try {
+            int i = simplex();
+            printSimplex(i);
+            result.add(solution.getValue());
+        } catch (Exception e) {
+            Log.i(TAG, e.toString());
+        }
+        clear();
+        I = 800;
+        J = 1000;
+        initRandom();
+        try {
+            int i = simplex();
+            printSimplex(i);
+            result.add(solution.getValue());
+        } catch (Exception e) {
+            Log.i(TAG, e.toString());
+        }
+        return result;
+    }
+
+
     public void initAndSolve(int ii, int jj, ArrayList<Double> bb, ArrayList<Double> cc, ArrayList<Double> yy, ArrayList<ArrayList<Double>> aa) {
 
         yk = new ArrayList<>();
         lk = new HashMap<>();
 
-        /*I = ii;
+        I = ii;
         J = jj;
         C = cc;
         B = bb;
         y0 = yy;
-        A = aa;*/
-        init_test2();
+        A = aa;
+        //init_test2();
 
         try {
             try {
@@ -160,9 +221,7 @@ public class LinProgSolver {
         }
     }
 
-    private void init() {
-        I = 80;
-        J = 100;
+    private void initRandom() {
         for (int j = 0; j < J; j++) {
             y0.add(10.0);
         }
@@ -175,7 +234,6 @@ public class LinProgSolver {
                 A.get(i).add(LinSupUtils.getRandom(-1.0,2.0));
             }
         }
-
 
         for (int i = 0; i < I; i++) {
             B.add(LinSupUtils.getRandom(5.0,15.0));
@@ -342,24 +400,38 @@ public class LinProgSolver {
 
     private void printSimplex(int iters) {
         if (solution != null) {
+            String log = "Simplex MINIMIZE";
             Log.i(TAG, "----------- Simplex function MINIMIZE ---------");
-            Log.i(TAG, "STEPS: " + iters);
+            //Log.i(TAG, "STEPS: " + iters);
             Log.i(TAG, "f(x) = " + solution.getValue());
+            log += "\n" + "f(x) = " + solution.getValue();
             for (int j = 0; j < J; j++) {
                 Log.i(TAG, "x("+j+") = " + solution.getPoint()[j]);
+                log += "\n" + "x("+j+") = " + solution.getPoint()[j];
             }
             Log.i(TAG, "----------- -------------------------- ---------");
+            log+="\n--------------------";
+            if (mCallback != null) {
+                mCallback.simplexResult(log);
+            }
         }
     }
 
     private void printLinSup() {
         Log.i(TAG, "----------- LinSup function MINIMIZE ---------");
-        Log.i(TAG, "STEPS: " + (yk.size() - 1));
+        String log = "LinSup MINIMIZE";
+        //Log.i(TAG, "STEPS: " + (yk.size() - 1));
         Log.i(TAG, "f(x) = " + LinSupUtils.innerProduction(C, yk.get(yk.size() - 1)));
+        log += "\n" + "f(x) = " + LinSupUtils.innerProduction(C, yk.get(yk.size() - 1));
         for (int j = 0; j < J; j++) {
             Log.i(TAG, "x(" + j + ") = " + yk.get(yk.size() - 1).get(j));
+            log+= "\n" + "x(" + j + ") = " + yk.get(yk.size() - 1).get(j);
         }
         Log.i(TAG, "----------- -------------------------- ---------");
+        log+="\n--------------------";
+        if (mCallback != null) {
+            mCallback.simplexResult(log);
+        }
 
     }
 

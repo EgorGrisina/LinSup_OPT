@@ -16,11 +16,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ru.grit.egor.linsup.R;
-import ru.grit.egor.linsup.utils.LinProgSolver;
-
-/**
- * Created by egorg on 08.12.2016.
- */
+import ru.grit.egor.linsup.utils.LinSupSolver;
 
 public class CustomProblemActivity extends AppCompatActivity {
 
@@ -79,31 +75,46 @@ public class CustomProblemActivity extends AppCompatActivity {
                     }
                 }
 
+                Log.d(TAG, "all done! start solve");
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        LinProgSolver solver = new LinProgSolver();
-                        solver.setmCallback(new LinProgSolver.callback() {
+                        LinSupSolver solver = new LinSupSolver();
+                        solver.setmCallback(new LinSupSolver.callback() {
                             @Override
-                            public void error(String error) {
-                                text_result.setText(error);
+                            public void error(final String error) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        text_result.setText(error);
+                                    }
+                                });
                             }
 
                             @Override
-                            public void simplexResult(String result) {
-                                text_result.setText(text_result.getText().toString()+"\n"+result);
+                            public void simplexResult(final String result) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        text_result.setText(text_result.getText().toString()+"\n"+result);
+                                    }
+                                });
                             }
 
                             @Override
-                            public void linSupResult(String result) {
-                                text_result.setText(text_result.getText().toString()+"\n"+result);
+                            public void linSupResult(final String result) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        text_result.setText(text_result.getText().toString()+"\n"+result);
+                                    }
+                                });
                             }
                         });
                         solver.initAndSolve(i,j,b,c,y0,A);
                     }
                 }).start();
-
-                Log.d(TAG, "all done! start solve");
 
             } catch (Exception e) {
                 Log.d(TAG, "solveClicked parse exception");
