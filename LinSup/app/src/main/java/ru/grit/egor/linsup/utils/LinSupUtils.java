@@ -85,8 +85,9 @@ public class LinSupUtils {
     }
 
     public static int getRandom(int low, int high) {
-        if (high < low) {
+        if (high <= low) {
             Log.e(TAG, "getRandom : bad values!");
+            return 0;
         }
         if (high == 0 && low == 0) {
             Log.i(TAG, "getRandom : zero values!");

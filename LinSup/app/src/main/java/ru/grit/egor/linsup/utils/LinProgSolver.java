@@ -1,29 +1,23 @@
-package ru.grit.egor.linsup.activity;
+package ru.grit.egor.linsup.utils;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import org.apache.commons.math3.exception.MaxCountExceededException;
-import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
 import org.apache.commons.math3.optimization.GoalType;
 import org.apache.commons.math3.optimization.PointValuePair;
 import org.apache.commons.math3.optimization.linear.LinearConstraint;
 import org.apache.commons.math3.optimization.linear.LinearObjectiveFunction;
 import org.apache.commons.math3.optimization.linear.Relationship;
 import org.apache.commons.math3.optimization.linear.SimplexSolver;
+import org.apache.commons.math3.optimization.linear.UnboundedSolutionException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import ru.grit.egor.linsup.R;
-import ru.grit.egor.linsup.utils.LinSupUtils;
+public class LinProgSolver {
 
-public class StartActivity extends AppCompatActivity {
-
-    final static String TAG = StartActivity.class.getSimpleName();
+    final static String TAG = LinProgSolver.class.getSimpleName();
 
     ArrayList<ArrayList<Double>> yk = new ArrayList<>();
 
@@ -36,7 +30,7 @@ public class StartActivity extends AppCompatActivity {
     int N = 10;
     int I = 4;
     int J = 4;
-    Double a = 0.99;
+    Double a = 0.999;
     Double lambda = 2.99;
     Double e = 1.0E-10;
     Double e2 = 1.0E-5;
@@ -44,8 +38,20 @@ public class StartActivity extends AppCompatActivity {
 
     PointValuePair solution = null;
 
+    private callback mCallback;
 
-    @Override
+    public void setmCallback(callback callback) {
+        mCallback = callback;
+    }
+
+    public interface callback {
+        void error(String error);
+        void simplexResult(String result);
+        void linSupResult(String result);
+    }
+
+
+    /*@Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
@@ -77,6 +83,40 @@ public class StartActivity extends AppCompatActivity {
             }
         }
         Log.i(TAG, "-------------------------------------------------------------------");
+    }*/
+
+    public void initAndSolve(int ii, int jj, ArrayList<Double> bb, ArrayList<Double> cc, ArrayList<Double> yy, ArrayList<ArrayList<Double>> aa) {
+
+        yk = new ArrayList<>();
+        lk = new HashMap<>();
+
+        /*I = ii;
+        J = jj;
+        C = cc;
+        B = bb;
+        y0 = yy;
+        A = aa;*/
+        init_test2();
+
+        try {
+            try {
+                int i = simplex();
+                printSimplex(i);
+            } catch (MaxCountExceededException e ) {
+                Log.i(TAG, "Max Count Exceeded Exception");
+                if (mCallback != null) {
+                    mCallback.error("Max Count Exceeded Exception");
+                }
+            }
+
+            startLinSup();
+            printLinSup();
+        } catch (UnboundedSolutionException e ) {
+            Log.i(TAG, "Unbounded Solution Exception");
+            if (mCallback != null) {
+                mCallback.error("Unbounded Solution Exception");
+            }
+        }
     }
 
     private void init_test1() {
@@ -121,8 +161,8 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void init() {
-        I = 250;
-        J = 200;
+        I = 80;
+        J = 100;
         for (int j = 0; j < J; j++) {
             y0.add(10.0);
         }
@@ -142,9 +182,9 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-
+    private boolean stop = false;
     private void startLinSup() {
-
+        stop = false;
         int k = 0;                         // k <- 0
 
         yk.add(new ArrayList<Double>());   // yk(0) <- y0
@@ -192,7 +232,7 @@ public class StartActivity extends AppCompatActivity {
     private double getStoppingRule(ArrayList<Double> prev, ArrayList<Double> next) {
         ArrayList<Double> temp = LinSupUtils.vectorsDifference(next, prev);
         double result = LinSupUtils.secondVectorNorm(temp) / LinSupUtils.secondVectorNorm(next);
-        Log.d(TAG, "getStoppingRule " + result);
+        //Log.d(TAG, "getStoppingRule " + result);
         return result;
     }
 
@@ -220,7 +260,8 @@ public class StartActivity extends AppCompatActivity {
         }
         sum2 = sum2 / (2 * J);
 
-        Log.d(TAG, "getProximityFun = " + (sum1+sum2));
+        //Log.d(TAG, "getProximityFun = " + (sum1+sum2));
+
         return sum1+sum2;
     }
 
@@ -249,11 +290,18 @@ public class StartActivity extends AppCompatActivity {
         result = LinSupUtils.production(result, (lambda/I));
         result = LinSupUtils.vectorsSum(prev, result);
 
+
+
+        if (getProximityFun(result) < e) {
+            stop = true;
+        }
+
         for (int a = 0; a < result.size(); a++) {
             if (result.get(a) < 0.0) {
                 result.set(a,0.0);
             }
         }
+        //getProximityFun(result);
 
         return result;
 
