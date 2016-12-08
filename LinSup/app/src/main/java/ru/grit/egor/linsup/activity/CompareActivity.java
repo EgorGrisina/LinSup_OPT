@@ -56,6 +56,7 @@ public class CompareActivity extends AppCompatActivity {
 
         plot = (XYPlot) findViewById(R.id.plot);
         progressBar = (ProgressBar) findViewById(R.id.progress);
+        table = (LinearLayout) findViewById(R.id.table);
         findViewById(R.id.button3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,19 +96,18 @@ public class CompareActivity extends AppCompatActivity {
                 newval = val - val * LinSupUtils.getRandom(0.0009, 0.0012);
                 a0999.add(newval);
 
-                val = simplex.get(3);
+                /*val = simplex.get(3);
                 newval = val - val * LinSupUtils.getRandom(1.0, 1.2);
                 a09.add(newval);
                 newval = val - val * LinSupUtils.getRandom(0.016, 0.02);
                 a099.add(newval);
                 newval = val - val * LinSupUtils.getRandom(0.0013, 0.002);
-                a0999.add(newval);
+                a0999.add(newval);*/
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         progressBar.setVisibility(View.GONE);
-                        showPlot();
                         TextView sim_tv = (TextView) findViewById(R.id.simplex);
                         TextView lin1 = (TextView) findViewById(R.id.linsup_1);
                         TextView lin2 = (TextView) findViewById(R.id.linsup_2);
@@ -135,7 +135,7 @@ public class CompareActivity extends AppCompatActivity {
         PanZoom.attach(plot, PanZoom.Pan.BOTH, PanZoom.Zoom.STRETCH_VERTICAL);
         // plot.setRange
 
-        final String[] domainLabels = {"80x100", "200x250", "400x500", "800x1000"};
+        final String[] domainLabels = {"80x100", "200x250", "400x500"/*, "800x1000"*/};
 
         ArrayList<Double> re1 = new ArrayList<>();
         ArrayList<Double> re2 = new ArrayList<>();

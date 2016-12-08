@@ -131,7 +131,7 @@ public class LinSupSolver {
         } catch (Exception e) {
             Log.i(TAG, e.toString());
         }
-        clear();
+        /*clear();
         I = 800;
         J = 1000;
         initRandom();
@@ -141,7 +141,7 @@ public class LinSupSolver {
             result.add(solution.getValue());
         } catch (Exception e) {
             Log.i(TAG, e.toString());
-        }
+        }*/
         return result;
     }
 
