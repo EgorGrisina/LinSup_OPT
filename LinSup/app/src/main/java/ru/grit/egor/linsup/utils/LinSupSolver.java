@@ -240,6 +240,10 @@ public class LinSupSolver {
         }
     }
 
+
+
+
+
     private boolean stop = false;
     private void startLinSup() {
         stop = false;
@@ -255,15 +259,18 @@ public class LinSupSolver {
                 (k==0 || getStoppingRule(yk.get(k-1),yk.get(k)) > e2)) {
 
             int n = 0;                      // n <- 0
+            if (lk.get(k-1) == null) return;
             int l = LinSupUtils.getRandom(k, lk.get(k-1)); // l <- rand(k,lk(k-1)
 
             ykn.put(k, new HashMap<Integer, ArrayList<Double>>());  // ykn <- yk
+            if (ykn.get(k) == null) return;
             ykn.get(k).put(n, new ArrayList<Double>());
             ykn.get(k).get(n).addAll(yk.get(k));
 
             while (n < N) {
 
                 Double betta = Math.pow(a, l);   // Bkn <- nl
+                if (ykn.get(k) == null || ykn.get(k).get(n) == null) return;
                 ArrayList<Double> z = LinSupUtils.getZ(ykn.get(k).get(n), betta, C); // z <- ykn - betta* c / ||c||2
 
                 n = n + 1;                        // n <- n+1
