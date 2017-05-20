@@ -6,16 +6,16 @@ package ru.grit.egor.linsup.utils;
 
 public class Log {
     public static void d(String TAG, String mes) {
-        print("debug",TAG, mes);
+        print("debg",TAG, mes);
     }
     public static void v(String TAG, String mes) {
-        print("verbose",TAG, mes);
+        print("verb",TAG, mes);
     }
     public static void w(String TAG, String mes) {
-        print("warning",TAG, mes);
+        print("warn",TAG, mes);
     }
     public static void e(String TAG, String mes) {
-        print("error",TAG, mes);
+        print("eror",TAG, mes);
     }
     public static void i(String TAG, String mes) {
         print("info",TAG, mes);
