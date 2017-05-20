@@ -59,8 +59,8 @@ public class LinSupUtilsUnitTest {
         addToList(first, 1.0, 1.0);
         addToList(second, 1.0, 1.0, 1.0, 1.0, 1.0);
 
-        assertEquals(0.0, LinSupUtils.innerProduction(first, second), delta);
-        assertEquals(2.0, LinSupUtils.innerProduction(second, first), delta);
+        assertEquals(2.0, LinSupUtils.innerProduction(first, second), delta);
+        assertEquals(0.0, LinSupUtils.innerProduction(second, first), delta);
 
     }
 
@@ -291,20 +291,20 @@ public class LinSupUtilsUnitTest {
 
         ArrayList<Double> first = new ArrayList<>();
         ArrayList<Double> second = new ArrayList<>();
-        addToList(first, 1.0, 1.0);
+        addToList(first, 2.0, 2.0);
         addToList(second, 1.0, 1.0, 1.0, 1.0);
 
         ArrayList<Double> result = LinSupUtils.vectorsDifference(first, second);
         assertNotNull(result);
         assertEquals(result.size(), first.size());
         for (int i = 0; i < result.size(); i++) {
-            assertEquals(result.get(i), first.get(i), delta);
+            assertEquals(result.get(i), 1.0, delta);
         }
 
         first.clear();
         second.clear();
         result.clear();
-        addToList(first, 2.0, 2.0, 1.0, 1.0);
+        addToList(first, 1.0, 1.0, 1.0, 1.0);
         addToList(second, 1.0, 1.0);
 
         result = LinSupUtils.vectorsDifference(first, second);
