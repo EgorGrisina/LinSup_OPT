@@ -19,7 +19,7 @@ public class LinSupUtils {
 
         if (DEBUG) Log.v(TAG, "[innerProduction] vec1.size: " + vec1.size() + " vec2.size: " + vec2.size());
 
-        if (vec1.size() < vec2.size()) {
+        if (vec1.size() > vec2.size()) {
             if (DEBUG) Log.e(TAG, "[innerProduction] bad vectors size!");
             return prod;
         }
@@ -49,6 +49,7 @@ public class LinSupUtils {
         Double norm = 0.0;
         if (vector == null) {
             Log.e(TAG, "[secondVectorNorm] bad vector null");
+            return norm;
         }
         if (vector.size() == 0) {
             Log.w(TAG, "[secondVectorNorm] bad vector size = 0");
@@ -76,6 +77,11 @@ public class LinSupUtils {
 
         if (vec == null) {
             if (DEBUG) Log.e(TAG, "[production] bad vector null");
+            return result;
+        }
+
+        if (x == null) {
+            if (DEBUG) Log.e(TAG, "[production] bad production value null");
             return result;
         }
 
@@ -114,7 +120,7 @@ public class LinSupUtils {
 
         if (DEBUG) Log.v(TAG, "[vectorsDifference] vec1.size: " + vec1.size() + " vec2.size: " + vec2.size());
 
-        if (vec1.size() < vec2.size()) {
+        if (vec1.size() > vec2.size()) {
             if (DEBUG) Log.w(TAG, "[vectorsDifference] bad vector2 size!");
             return vec1;
         }
@@ -151,7 +157,7 @@ public class LinSupUtils {
 
         if (DEBUG) Log.v(TAG, "[vectorsSum] vec1.size: " + vec1.size() + " vec2.size: " + vec2.size());
 
-        if (vec1.size() < vec2.size()) {
+        if (vec1.size() > vec2.size()) {
             if (DEBUG) Log.w(TAG, "[vectorsSum] bad vector2 size!");
             return vec1;
         }
@@ -189,6 +195,11 @@ public class LinSupUtils {
         if (high == 0 && low == 0) {
             if (DEBUG) Log.w(TAG, "[getRandom int] zero values!");
             return 0;
+        }
+
+        if (high == low) {
+            if (DEBUG) Log.w(TAG, "[getRandom int] equals values!");
+            return low;
         }
 
         Random r = new Random();
