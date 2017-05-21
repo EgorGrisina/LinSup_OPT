@@ -8,9 +8,15 @@ public class LinSupUtils {
     final static String TAG = LinSupUtils.class.getSimpleName();
     final static boolean DEBUG = true;
 
+    /*
+     * Описание: Скалярное произведение векторов
+     * Тип данных: Double
+     * Входные данные: Два вектора одинаковой размерности
+     * Возвращаемые данные: Число, произведение векторов
+     */
     public static double innerProduction(ArrayList<Double> vec1, ArrayList<Double> vec2) {
         if (DEBUG) Log.i(TAG, "[innerProduction] start");
-        Double prod = 0.0;
+        double prod = 0.0;
 
         if (vec1 == null || vec2 == null) {
             if (DEBUG) Log.e(TAG, "[innerProduction] bad vector null");
@@ -24,12 +30,8 @@ public class LinSupUtils {
             return prod;
         }
 
-        if (vec1.size() != vec2.size()) {
-            if (DEBUG) Log.w(TAG, "[innerProduction] bas vector2 size");
-        }
-
-        if (vec1.size() == 0) {
-            if (DEBUG) Log.w(TAG, "[innerProduction] vectros size = 0");
+        if (vec1.size() != vec2.size() || vec1.size() == 0) {
+            if (DEBUG) Log.w(TAG, "[innerProduction] bas vectors size");
         }
 
         for (int i = 0; i < vec1.size(); i++) {
@@ -43,10 +45,16 @@ public class LinSupUtils {
         return prod;
     }
 
+    /*
+     * Описание: Вычисление второй нормы вектора
+     * Тип данных: Double
+     * Входные данные: Вектор чисел
+     * Возвращаемые данные: Число, квадратный корень из суммы квадратов вектора
+     */
     public static double secondVectorNorm(ArrayList<Double> vector) {
         if (DEBUG) Log.i(TAG, "[secondVectorNorm] start");
 
-        Double norm = 0.0;
+        double norm = 0.0;
         if (vector == null) {
             Log.e(TAG, "[secondVectorNorm] bad vector null");
             return norm;
@@ -69,19 +77,20 @@ public class LinSupUtils {
         return Math.sqrt(norm);
     }
 
+    /*
+     * Описание: Произведение вектора на число
+     * Тип данных: Double
+     * Входные данные: Вектор чисел и множитель
+     * Возвращаемые данные: Вектор чисел, равный произведению каждого элемента на множитель
+     */
     public static ArrayList<Double> production(ArrayList<Double> vec, Double x) {
 
         if (DEBUG) Log.i(TAG, "[production] start");
 
         ArrayList<Double> result = new ArrayList<Double>();
 
-        if (vec == null) {
-            if (DEBUG) Log.e(TAG, "[production] bad vector null");
-            return result;
-        }
-
-        if (x == null) {
-            if (DEBUG) Log.e(TAG, "[production] bad production value null");
+        if (vec == null || x == null) {
+            if (DEBUG) Log.e(TAG, "[production] bad input values null");
             return result;
         }
 
@@ -107,6 +116,12 @@ public class LinSupUtils {
         return result;
     }
 
+    /*
+     * Описание: Разница векторов
+     * Тип данных: Double
+     * Входные данные: Два вектора одинаковой размерности
+     * Возвращаемые данные: Вектор той же размерности, равный разнице элементов первого и второго вектора. res = (vec1 - vec2)
+     */
     public static ArrayList<Double> vectorsDifference(ArrayList<Double> vec1, ArrayList<Double>  vec2) {
 
         if (DEBUG) Log.i(TAG, "[vectorsDifference] start");
@@ -120,13 +135,9 @@ public class LinSupUtils {
 
         if (DEBUG) Log.v(TAG, "[vectorsDifference] vec1.size: " + vec1.size() + " vec2.size: " + vec2.size());
 
-        if (vec1.size() > vec2.size()) {
-            if (DEBUG) Log.w(TAG, "[vectorsDifference] bad vector2 size!");
-            return vec1;
-        }
-
-        if (vec1.size() == 0) {
-            if (DEBUG) Log.w(TAG, "[vectorsDifference] vector size = 0");
+        if (vec1.size() > vec2.size() || vec1.size() == 0) {
+            if (DEBUG) Log.w(TAG, "[vectorsDifference] bad vectors size!");
+            return result;
         }
 
         for (int i = 0; i < vec1.size(); i++) {
@@ -144,6 +155,12 @@ public class LinSupUtils {
         return result;
     }
 
+    /*
+     * Описание: Сумма векторов
+     * Тип данных: Double
+     * Входные данные: Два вектора одинаковой размерности
+     * Возвращаемые данные: Вектор той же размерности, равный сумме элементов первого и второго вектора. res = (vec1 + vec2)
+     */
     public static ArrayList<Double> vectorsSum(ArrayList<Double> vec1, ArrayList<Double>  vec2) {
 
         if (DEBUG) Log.i(TAG, "[vectorsSum] start");
@@ -157,13 +174,9 @@ public class LinSupUtils {
 
         if (DEBUG) Log.v(TAG, "[vectorsSum] vec1.size: " + vec1.size() + " vec2.size: " + vec2.size());
 
-        if (vec1.size() > vec2.size()) {
-            if (DEBUG) Log.w(TAG, "[vectorsSum] bad vector2 size!");
-            return vec1;
-        }
-
-        if (vec1.size() == 0) {
-            if (DEBUG) Log.w(TAG, "[vectorsSum] vector size = 0");
+        if (vec1.size() > vec2.size() || vec1.size() == 0) {
+            if (DEBUG) Log.w(TAG, "[vectorsSum] bad vectors size!");
+            return result;
         }
 
         for (int i = 0; i < vec1.size(); i++) {
@@ -182,6 +195,12 @@ public class LinSupUtils {
         return result;
     }
 
+    /*
+     * Описание: Случайное число
+     * Тип данных: Integer
+     * Входные данные: Верхняя и нижняя граница случайных чисел.
+     * Возвращаемые данные: Случайное число в заданном диапазоне
+     */
     public static int getRandom(int low, int high) {
 
         if (DEBUG) Log.i(TAG, "[getRandom int] start");
@@ -213,6 +232,12 @@ public class LinSupUtils {
         return result;
     }
 
+    /*
+     * Описание: Случайное число
+     * Тип данных: Double
+     * Входные данные: Верхняя и нижняя граница случайных чисел.
+     * Возвращаемые данные: Случайное число в заданном диапазоне
+     */
     public static double getRandom(double low, double high) {
 
         if (DEBUG) Log.i(TAG, "[getRandom double] start");
@@ -239,6 +264,12 @@ public class LinSupUtils {
         return result;
     }
 
+    /*
+     * Описание: Вычисление вектора Z
+     * Тип данных: Double
+     * Входные данные: Вектор Y и С одинаковых размерностей и множитель betta.
+     * Возвращаемые данные: Вектор той же размерности Z = Y - C * (betta/||C||)
+     */
     public static ArrayList<Double> getZ(ArrayList<Double> y, Double betta, ArrayList<Double> c) {
 
         if (DEBUG) Log.i(TAG, "[getZ] start");
@@ -272,6 +303,12 @@ public class LinSupUtils {
         return z;
     }
 
+    /*
+     * Описание: Преобразование односвязного списка в массив чисел
+     * Тип данных: Double
+     * Входные данные: Односвязный список из чисел.
+     * Возвращаемые данные: Массив чисел той же размерности
+     */
     public static double[] toArray(ArrayList<Double> list) {
 
         if (DEBUG) Log.i(TAG, "[toArray] start");
@@ -300,6 +337,12 @@ public class LinSupUtils {
         return array;
     }
 
+    /*
+     * Описание: Преобразование массива чисел в односвязный список
+     * Тип данных: Double
+     * Входные данные: Массив чисел.
+     * Возвращаемые данные: Односвязный список из чисел той же размерности
+     */
     public static ArrayList<Double> toList(double[] array) {
 
         if (DEBUG) Log.i(TAG, "[toList] start");
